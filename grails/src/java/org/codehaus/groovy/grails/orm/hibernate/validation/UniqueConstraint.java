@@ -14,7 +14,6 @@
  */
 package org.codehaus.groovy.grails.orm.hibernate.validation;
 
-import groovy.lang.GString;
 import org.codehaus.groovy.grails.commons.*;
 import org.codehaus.groovy.grails.exceptions.GrailsRuntimeException;
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -71,21 +70,21 @@ public class UniqueConstraint extends AbstractPersistentConstraint {
     public void setParameter(Object constraintParameter) {
         if(!(constraintParameter instanceof Boolean || 
         		constraintParameter instanceof String || 
-        		constraintParameter instanceof GString ||
+        		constraintParameter instanceof CharSequence ||
         		constraintParameter instanceof List)) {
             throw new IllegalArgumentException("Parameter for constraint ["+UNIQUE_CONSTRAINT+"] of property ["+constraintPropertyName+"] of class ["+constraintOwningClass+"] must be a boolean or string value");
         }
 
         if( constraintParameter instanceof List ) {
             for (Object parameter : ((List) constraintParameter)) {
-                if (!(parameter instanceof String || parameter instanceof GString)) {
+                if (!(parameter instanceof String || parameter instanceof CharSequence)) {
                     throw new IllegalArgumentException("Parameter for constraint [" + UNIQUE_CONSTRAINT + "] of property [" + constraintPropertyName + "] of class [" + constraintOwningClass + "] must be a boolean or string value");
                 }
                 else {
                     this.uniquenessGroup.add(parameter.toString());
                 }
             }
-        } else if( constraintParameter instanceof String || constraintParameter instanceof GString ) {
+        } else if( constraintParameter instanceof String || constraintParameter instanceof CharSequence ) {
         	this.uniquenessGroup.add(constraintParameter.toString());
         	this.unique = true;
         } else {
@@ -151,7 +150,7 @@ public class UniqueConstraint extends AbstractPersistentConstraint {
                                     String uniquenessGroupPropertyName = (String) anUniquenessGroup;
                                     Object uniquenessGroupPropertyValue = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(target, uniquenessGroupPropertyName);
 
-                                    if (DomainClassArtefactHandler.isDomainClass(uniquenessGroupPropertyValue.getClass())) {
+                                    if (uniquenessGroupPropertyValue != null && DomainClassArtefactHandler.isDomainClass(uniquenessGroupPropertyValue.getClass())) {
                                         try {
                                             // We are merely verifying that the object is not transient here
                                             session.lock(uniquenessGroupPropertyValue, LockMode.NONE);

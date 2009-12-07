@@ -19,7 +19,6 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import grails.util.GrailsUtil;
 import grails.util.Metadata;
-import groovy.lang.GString;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObjectSupport;
 import groovy.util.ConfigObject;
@@ -212,13 +211,35 @@ public class DefaultGrailsApplication extends GroovyObjectSupport implements Gra
      * @see org.codehaus.groovy.grails.commons.ArtefactHandler
      */
     private void initArtefactHandlers() {
-        registerArtefactHandler(new DomainClassArtefactHandler());
-        registerArtefactHandler(new ControllerArtefactHandler());
-        registerArtefactHandler(new ServiceArtefactHandler());
-        registerArtefactHandler(new TagLibArtefactHandler());
-        registerArtefactHandler(new BootstrapArtefactHandler());
-        registerArtefactHandler(new CodecArtefactHandler());
-        registerArtefactHandler(new UrlMappingsArtefactHandler());
+
+        final DomainClassArtefactHandler domainClassArtefactHandler = new AnnotationDomainClassArtefactHandler();
+        if(!hasArtefactHandler(domainClassArtefactHandler.getType()))
+            registerArtefactHandler(domainClassArtefactHandler);
+
+        final ControllerArtefactHandler controllerArtefactHandler = new ControllerArtefactHandler();
+        if(!hasArtefactHandler(controllerArtefactHandler.getType()))
+            registerArtefactHandler(controllerArtefactHandler);
+
+        final ServiceArtefactHandler serviceArtefactHandler = new ServiceArtefactHandler();
+        if(!hasArtefactHandler(serviceArtefactHandler.getType()))
+            registerArtefactHandler(serviceArtefactHandler);
+
+        final TagLibArtefactHandler tagLibArtefactHandler = new TagLibArtefactHandler();
+        if(!hasArtefactHandler(tagLibArtefactHandler.getType()))
+            registerArtefactHandler(tagLibArtefactHandler);
+
+        final BootstrapArtefactHandler bootstrapArtefactHandler = new BootstrapArtefactHandler();
+        if(!hasArtefactHandler(bootstrapArtefactHandler.getType()))
+            registerArtefactHandler(bootstrapArtefactHandler);
+
+
+        final CodecArtefactHandler codecArtefactHandler = new CodecArtefactHandler();
+        if(!hasArtefactHandler(codecArtefactHandler.getType()))
+            registerArtefactHandler(codecArtefactHandler);
+
+        final UrlMappingsArtefactHandler urlMappingsArtefactHandler = new UrlMappingsArtefactHandler();
+        if(!hasArtefactHandler(urlMappingsArtefactHandler.getType()))
+            registerArtefactHandler(urlMappingsArtefactHandler);
 
         // Cache the list as an array
         this.artefactHandlers = this.artefactHandlersByName.values().toArray(
@@ -658,6 +679,10 @@ public class DefaultGrailsApplication extends GroovyObjectSupport implements Gra
         artefactHandlersByName.put(handler.getType(), handler);
     }
 
+    public boolean hasArtefactHandler(String type) {
+        return artefactHandlersByName.containsKey(type);
+    }
+
     public ArtefactHandler[] getArtefactHandlers() {
         return artefactHandlers;
     }
@@ -738,7 +763,7 @@ public class DefaultGrailsApplication extends GroovyObjectSupport implements Gra
         match.find();
         if (match.matches()) {
             if (argsv.length > 0) {
-                if(argsv[0] instanceof GString) argsv[0] = argsv[0].toString();
+                if(argsv[0] instanceof CharSequence) argsv[0] = argsv[0].toString();
                 if ((argsv.length != 1) || !(argsv[0] instanceof String)) {
                     throw new IllegalArgumentException("Dynamic method get<Artefact>Class(artefactName) requires a " +
                             "single String parameter");
