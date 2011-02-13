@@ -24,6 +24,7 @@ class PluginController extends BaseWikiController {
     static int PORTAL_MAX_RESULTS = 5
     static int PORTAL_MIN_RATINGS = 1
     
+    def taggableService
     def wikiPageService
     def pluginService
     def commentService
@@ -332,12 +333,24 @@ class PluginController extends BaseWikiController {
 
     def browseByTag = {
         try {
-            def (plugins, pluginCount) = pluginService.listPluginsByTagWithTotal(params.tagName, max: params.max ?: 20)
-            return [currentPlugins: plugins, totalPlugins: pluginCount, tagName:params.tagName]
+            def maxResults = params.int('max') ?: 10
+            def offset = params.int('offset') ?: 0
+            def (plugins, pluginCount) = pluginService.listPluginsByTagWithTotal(params.tagName, max: maxResults, offset: offset)
+            return [currentPlugins: plugins, totalPlugins: pluginCount, tagName:params.tagName, max: maxResults, offset: offset]
         }
         catch (TagNotFoundException ex) {
             render view: "tagNotFound", model: [tagName: ex.tagName ?: '', msgCode: ex.code]
         }
+    }
+
+    /**
+     * Displays a cloud of all the tags attached to plugins.
+     */
+    def browseTags = {
+        // Get hold of all the plugin tags. This service method returns a map of tag
+        // names to counts, i.e. how many plugins have been tagged with each tag.
+        def allPluginTags = taggableService.getTagCounts("plugin").sort()
+        [tags: allPluginTags]
     }
 
     def showComment = {

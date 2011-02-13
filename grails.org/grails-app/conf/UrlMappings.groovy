@@ -35,6 +35,7 @@ class UrlMappings {
         "/plugin/showComment/$id"(controller: "plugin", action: "showComment")
         "/plugins/category/$category"(controller: "plugin", action: "home")
         "/plugins/tag/$tagName"(controller: "plugin", action: "browseByTag")
+        "/plugins/tags"(controller: "plugin", action: "browseTags")
 
         "/content/postComment/$id"(controller: "content", action:"postComment")
 
@@ -49,6 +50,7 @@ class UrlMappings {
         "/upload/$id?"(controller: "content", action: "uploadImage")
         "/register"(controller: "user", action: "register")
         "/login"(controller: "user", action: "login")
+        "/unauthorized"(controller: "user", action: "unauthorized")
         "/reminder"(controller: "user", action: "passwordReminder")
         "/profile"(controller: "user", action: "profile")
         "/logout"(controller: "user", action: "logout")
@@ -64,6 +66,7 @@ class UrlMappings {
         "/previous/$id/$number"(controller: "content", action: "previousWikiVersion")
 		
         "/screencasts"(controller:"screencast", action:"list") 
+        "/screencasts/tags"(controller:"screencast", action:"browseTags") 
         "/screencast/save"(controller:"screencast", action:"save") 
         "/screencast/search"(controller:"screencast", action:"search") 		
         "/screencast/update"(controller:"screencast", action:"update") 				

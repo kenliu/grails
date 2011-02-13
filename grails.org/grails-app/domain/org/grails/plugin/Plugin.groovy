@@ -12,14 +12,14 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 class Plugin implements Taggable, Commentable, Rateable {
 
     static final def WIKIS = ['installation','description','faq','screenshots']
-    static final def VERSION_PATTERN = /^(\d{1,}(\.\d+)*)(-\w*$)?/
+    static final def VERSION_PATTERN = /^(\d+(?:\.\d+)*)([\.\-\w]*)?$/
 
     transient cacheService
     transient pluginService
     
     String name
     String title
-    String groupId
+    String groupId = "org.grails.plugins"
     String summary
     WikiPage description
     WikiPage installation
@@ -72,9 +72,8 @@ class Plugin implements Taggable, Commentable, Rateable {
 
     static mapping = {
         cache 'nonstrict-read-write'
-        summary sqlType: 'text'
+        summary type: 'text'
     }
-
     
     def getFisheye() {
         downloadUrl ? "${ConfigurationHolder.config.plugins.fisheye}/grails-${name}" : ''

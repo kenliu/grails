@@ -35,12 +35,25 @@ class JSecurityAuthFilters {
         }
     }    
 
+    /**
+     * Called when an authenticated user tries to access a page that they don't
+     * have the rights for.
+     */
+    def onUnauthorized(subject, d) {
+        if (d.request.xhr) {
+            d.render "You do not have permission to access this page."
+        } else {
+            // Redirect to the 'unauthorized' page.
+            d.redirect controller: 'user', action: 'unauthorized'
+        }
+    }    
+
     static filters = {
        // Ensure that all controllers and actions require an authenticated user,
         
         // Creating, modifying, or deleting a book requires the "Administrator"
         // role.
-        wikiEditing(controller: "(content|news|plugin)", action: "(editNews|createNews|markupWikiPage|editWikiPage|createWikiPage|saveWikiPage|editPlugin|createPlugin|uploadImage)") {
+        wikiEditing(controller: "(content|news|plugin)", action: "(editNews|createNews|markupWikiPage|editWikiPage|createWikiPage|saveWikiPage|editPlugin|createPlugin|uploadImage|addTag|removeTag)") {
             before = {
                 accessControl {
                     role("Editor") || role("Administrator")
